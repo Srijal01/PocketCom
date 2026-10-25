@@ -1,0 +1,6 @@
+{
+  "framework": "vite",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build --workspace @pocketcam/web",
+  "outputDirectory": "apps/web/dist"
+}
