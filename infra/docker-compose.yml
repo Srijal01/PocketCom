@@ -1,0 +1,54 @@
+services:
+  signaling:
+    build:
+      context: ..
+      dockerfile: infra/signaling.Dockerfile
+    env_file:
+      - ../.env
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/web.Dockerfile
+      args:
+        VITE_SIGNALING_URL: ${VITE_SIGNALING_URL}
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  coturn:
+    image: coturn/coturn:4.6.3
+    command: >
+      -n --log-file=stdout --lt-cred-mech
+      --use-auth-secret --static-auth-secret=${TURN_SECRET}
+      --realm=${TURN_REALM}
+      --external-ip=${TURN_EXTERNAL_IP}
+      --listening-port=3478 --tls-listening-port=5349
+      --min-port=49160 --max-port=49200
+      --no-cli --no-multicast-peers --no-loopback-peers
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+      - "5349:5349/tcp"
+      - "49160-49200:49160-49200/udp"
+    restart: unless-stopped
+
+  proxy:
+    image: caddy:2.9-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - signaling
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

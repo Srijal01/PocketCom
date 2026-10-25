@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.gradle/
+local.properties
+*.iml
+.idea/
+captures/
+out/

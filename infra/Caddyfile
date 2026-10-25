@@ -1,0 +1,7 @@
+{$DASHBOARD_DOMAIN} {
+    reverse_proxy web:80
+}
+
+{$SIGNALING_DOMAIN} {
+    reverse_proxy signaling:8080
+}
